@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+  mysql:
+    image: mysql:5.6.27
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    container_name: vgang-auth-db
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: auth
+      MYSQL_USER: root2
+      MYSQL_PASSWORD: secret2
+
+volumes:
+  mysqldata:
