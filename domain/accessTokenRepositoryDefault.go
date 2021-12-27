@@ -2,7 +2,6 @@ package domain
 
 import (
 	"github.com/golang-jwt/jwt"
-	"gitlab.com/bshadmehr76/vgang-auth/utils"
 )
 
 type AccessTokenRepositoryDefault struct {
@@ -16,7 +15,7 @@ func (r AccessTokenRepositoryDefault) IsAuthorized(token AccessToken, route stri
 		}
 	}
 
-	if jwtToken, err := utils.JwtTokenFromString(token.AccessToken); err != nil {
+	if jwtToken, err := JwtTokenFromString(token.AccessToken); err != nil {
 		return false, nil
 	} else {
 		if jwtToken.Valid {

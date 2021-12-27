@@ -1,3 +1,7 @@
+CREATE DATABASE auth;
+USE auth;
+
+DROP TABLE IF EXISTS `uers`;
 CREATE TABLE ` users ` (
   ` id ` int(10) unsigned NOT NULL AUTO_INCREMENT,
   ` created_at ` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
