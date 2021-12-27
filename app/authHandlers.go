@@ -92,6 +92,17 @@ func (ah AuthHandler) changePassword(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (ah AuthHandler) logout(w http.ResponseWriter, r *http.Request) {
+	authHeader := r.Header.Get("Authorization")
+	token := domain.AccessToken{AccessToken: authHeader}
+	response, err := ah.service.Logout(token)
+	if err != nil {
+		utils.WriteResponse(w, err.Code, err.AsMessage())
+	} else {
+		utils.WriteResponse(w, http.StatusOK, response)
+	}
+}
+
 func (ah AuthHandler) verify(w http.ResponseWriter, r *http.Request) {
 
 }

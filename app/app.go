@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/didip/tollbooth"
+	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/bshadmehr76/vgang-auth/domain"
@@ -58,6 +59,15 @@ func getMySQLClient() *sqlx.DB {
 	return client
 }
 
+func getRedisclient() *redis.Client {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+	return rdb
+}
+
 func Start() {
 	setupMode()
 	sanityCheck()
@@ -65,7 +75,8 @@ func Start() {
 	mux := mux.NewRouter()
 
 	db := getMySQLClient()
-	handlers := AuthHandler{service.NewDefaultAuthService(domain.NewUserRepositoryDB(db))}
+	redis := getRedisclient()
+	handlers := AuthHandler{service.NewDefaultAuthService(domain.NewUserRepositoryDB(db), domain.NewAccessTokenRepositoryDefault(redis))}
 
 	lmt := tollbooth.NewLimiter(1, nil)
 	lmt.SetIPLookups([]string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"})
@@ -75,9 +86,10 @@ func Start() {
 	mux.HandleFunc("/get_otp", handlers.GetOtp).Methods(http.MethodPost).Name("auth-get_otp")
 	mux.HandleFunc("/forget_pass", handlers.forgetPassword).Methods(http.MethodPost).Name("auth-forget_pass")
 	mux.HandleFunc("/change_password", handlers.changePassword).Methods(http.MethodPost).Name("auth-change_pass")
+	mux.HandleFunc("/logout", handlers.logout).Methods(http.MethodPost).Name("auth-logout")
 	mux.HandleFunc("/verify", handlers.verify).Methods(http.MethodPost)
 
-	authMiddleware := AuthMiddleware{domain.NewAccessTokenRepositoryDefault(), domain.NewUserRepositoryDB(db)}
+	authMiddleware := AuthMiddleware{domain.NewAccessTokenRepositoryDefault(redis), domain.NewUserRepositoryDB(db)}
 	mux.Use(authMiddleware.authorizationHandler())
 
 	// Starting server

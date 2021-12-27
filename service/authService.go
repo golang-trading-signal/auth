@@ -13,15 +13,17 @@ type AuthService interface {
 	GetOtp(dto.GetOtpRequest) (*dto.GetOtpResponse, *errs.AppError)
 	ForgetPass(dto.ForgetPassRequest) (*dto.ForgetPassResponse, *errs.AppError)
 	ChangePassword(dto.ChangePassRequest, *domain.User) (*dto.ChangePassResponse, *errs.AppError)
+	Logout(token domain.AccessToken) (*dto.LogoutResponse, *errs.AppError)
 	Verify(dto.VerifyTokenRequest) (*dto.VerifyTokenResponse, *errs.AppError)
 }
 
 type DefaultAuthService struct {
-	repo domain.UserRepository
+	userRrepo       domain.UserRepository
+	accessTokenRepo domain.AccessTokenRepository
 }
 
 func (s DefaultAuthService) Login(loginRequest dto.LoginRequest) (*dto.LoginResponse, *errs.AppError) {
-	u, err := s.repo.GetUserByUserEmail(loginRequest.Email)
+	u, err := s.userRrepo.GetUserByUserEmail(loginRequest.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +45,7 @@ func (s DefaultAuthService) Login(loginRequest dto.LoginRequest) (*dto.LoginResp
 }
 
 func (s DefaultAuthService) Signup(signupRequest dto.SignupRequest) (*dto.SignupResponse, *errs.AppError) {
-	u, _ := s.repo.GetUserByUserEmail(signupRequest.Email)
+	u, _ := s.userRrepo.GetUserByUserEmail(signupRequest.Email)
 	if u != nil {
 		err := errs.NewBadRequestError("Email address is taken")
 		return nil, err
@@ -64,7 +66,7 @@ func (s DefaultAuthService) Signup(signupRequest dto.SignupRequest) (*dto.Signup
 
 	user.SecretKey = secretKey
 
-	id, err := s.repo.CreateUser(user.Email, user.Name, user.Password, user.SecretKey)
+	id, err := s.userRrepo.CreateUser(user.Email, user.Name, user.Password, user.SecretKey)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +77,7 @@ func (s DefaultAuthService) Signup(signupRequest dto.SignupRequest) (*dto.Signup
 }
 
 func (s DefaultAuthService) GetOtp(getOtpRequest dto.GetOtpRequest) (*dto.GetOtpResponse, *errs.AppError) {
-	u, err := s.repo.GetUserByUserEmail(getOtpRequest.Email)
+	u, err := s.userRrepo.GetUserByUserEmail(getOtpRequest.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +93,7 @@ func (s DefaultAuthService) GetOtp(getOtpRequest dto.GetOtpRequest) (*dto.GetOtp
 }
 
 func (s DefaultAuthService) ForgetPass(forgetPassRequest dto.ForgetPassRequest) (*dto.ForgetPassResponse, *errs.AppError) {
-	u, err := s.repo.GetUserByUserEmail(forgetPassRequest.Email)
+	u, err := s.userRrepo.GetUserByUserEmail(forgetPassRequest.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +115,7 @@ func (s DefaultAuthService) ForgetPass(forgetPassRequest dto.ForgetPassRequest) 
 			return nil, errs.NewUnexpectedError("Error while hashing password")
 		}
 
-		err = s.repo.UpdateUserPassword(forgetPassRequest.Email, hashedPassword)
+		err = s.userRrepo.UpdateUserPassword(forgetPassRequest.Email, hashedPassword)
 		if err != nil {
 			return nil, err
 		}
@@ -139,7 +141,7 @@ func (s DefaultAuthService) ChangePassword(changePassRequest dto.ChangePassReque
 			return nil, errs.NewUnexpectedError("Error while hashing password")
 		}
 
-		err = s.repo.UpdateUserPassword(user.Email, hashedPassword)
+		err = s.userRrepo.UpdateUserPassword(user.Email, hashedPassword)
 		if err != nil {
 			return nil, err
 		}
@@ -154,10 +156,21 @@ func (s DefaultAuthService) ChangePassword(changePassRequest dto.ChangePassReque
 	}
 }
 
+func (s DefaultAuthService) Logout(token domain.AccessToken) (*dto.LogoutResponse, *errs.AppError) {
+	err := s.accessTokenRepo.Logout(token)
+	response := dto.LogoutResponse{}
+	response.Status = true
+	if err != nil {
+		response.Status = false
+		return &response, err
+	}
+	return &response, nil
+}
+
 func (os DefaultAuthService) Verify(verifyTokenRequest dto.VerifyTokenRequest) (*dto.VerifyTokenResponse, *errs.AppError) {
 	return nil, nil
 }
 
-func NewDefaultAuthService(repo domain.UserRepository) DefaultAuthService {
-	return DefaultAuthService{repo}
+func NewDefaultAuthService(userRrepo domain.UserRepository, tokenRrepo domain.AccessTokenRepository) DefaultAuthService {
+	return DefaultAuthService{userRrepo: userRrepo, accessTokenRepo: tokenRrepo}
 }

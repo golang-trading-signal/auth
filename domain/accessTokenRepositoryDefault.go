@@ -1,10 +1,20 @@
 package domain
 
 import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/go-redis/redis/v8"
 	"github.com/golang-jwt/jwt"
+	"gitlab.com/bshadmehr76/vgang-auth/errs"
+	"gitlab.com/bshadmehr76/vgang-auth/logger"
 )
 
+var ctx = context.Background()
+
 type AccessTokenRepositoryDefault struct {
+	redis *redis.Client
 }
 
 func (r AccessTokenRepositoryDefault) IsAuthorized(token AccessToken, route string, vars map[string]string) (bool, *jwt.MapClaims) {
@@ -13,6 +23,15 @@ func (r AccessTokenRepositoryDefault) IsAuthorized(token AccessToken, route stri
 		if r == route {
 			return true, nil
 		}
+	}
+
+	val, err := r.redis.Get(ctx, token.AccessToken).Result()
+	if err != nil {
+		// logger.Error(err.Error())
+	}
+	fmt.Println(val)
+	if val != "" {
+		return false, nil
 	}
 
 	if jwtToken, err := JwtTokenFromString(token.AccessToken); err != nil {
@@ -27,6 +46,28 @@ func (r AccessTokenRepositoryDefault) IsAuthorized(token AccessToken, route stri
 	return false, nil
 }
 
-func NewAccessTokenRepositoryDefault() AccessTokenRepositoryDefault {
-	return AccessTokenRepositoryDefault{}
+func (r AccessTokenRepositoryDefault) Logout(token AccessToken) *errs.AppError {
+	if token.AccessToken != "" {
+		err := r.redis.Set(ctx, token.AccessToken, token.GetExpiresAt(), time.Hour).Err()
+		if err != nil {
+			logger.Error("Error while trying to add token to redis: " + err.Error())
+			err := errs.NewUnexpectedError("Error while trying to add token to redis")
+			return err
+		}
+	}
+
+	if token.RefreshToken != "" {
+		err := r.redis.Set(ctx, token.AccessToken, token.GetefreshTokenExpiresAt(), time.Hour).Err()
+		if err != nil {
+			logger.Error("Error while trying to add refresh token to redis: " + err.Error())
+			err := errs.NewUnexpectedError("Error while trying to add refresh token to redis")
+			return err
+		}
+	}
+
+	return nil
+}
+
+func NewAccessTokenRepositoryDefault(redis *redis.Client) AccessTokenRepositoryDefault {
+	return AccessTokenRepositoryDefault{redis}
 }

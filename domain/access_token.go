@@ -2,6 +2,7 @@ package domain
 
 import (
 	"os"
+	"time"
 
 	"github.com/golang-jwt/jwt"
 	"gitlab.com/bshadmehr76/vgang-auth/errs"
@@ -17,6 +18,15 @@ type AccessToken struct {
 
 type AccessTokenRepository interface {
 	IsAuthorized(token AccessToken, route string, vars map[string]string) (bool, *jwt.MapClaims)
+	Logout(token AccessToken) *errs.AppError
+}
+
+func (at AccessToken) GetExpiresAt() int64 {
+	return time.Now().Add(time.Minute * 10).Unix()
+}
+
+func (at AccessToken) GetefreshTokenExpiresAt() int64 {
+	return time.Now().Add(time.Minute * 10).Unix()
 }
 
 func GetNewAccessToken(claims jwt.MapClaims) (*AccessToken, *errs.AppError) {
