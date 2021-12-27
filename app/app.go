@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/didip/tollbooth"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/bshadmehr76/vgang-auth/domain"
@@ -66,8 +67,11 @@ func Start() {
 	db := getMySQLClient()
 	handlers := AuthHandler{service.NewDefaultAuthService(domain.NewUserRepositoryDB(db))}
 
-	mux.HandleFunc("/login", handlers.login).Methods(http.MethodPost).Name("auth-login")
-	mux.HandleFunc("/signup", handlers.signup).Methods(http.MethodPost).Name("auth-signup")
+	lmt := tollbooth.NewLimiter(1, nil)
+	lmt.SetIPLookups([]string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"})
+
+	mux.Handle("/login", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), handlers.login)).Methods(http.MethodPost).Name("auth-login")
+	mux.Handle("/signup", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), handlers.signup)).Methods(http.MethodPost).Name("auth-signup")
 	mux.HandleFunc("/get_otp", handlers.GetOtp).Methods(http.MethodPost).Name("auth-get_otp")
 	mux.HandleFunc("/forget_pass", handlers.forgetPassword).Methods(http.MethodPost).Name("auth-forget_pass")
 	mux.HandleFunc("/change_password", handlers.changePassword).Methods(http.MethodPost).Name("auth-change_pass")
