@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -29,7 +28,6 @@ func (r AccessTokenRepositoryDefault) IsAuthorized(token AccessToken, route stri
 	if err != nil {
 		// logger.Error(err.Error())
 	}
-	fmt.Println(val)
 	if val != "" {
 		return false, nil
 	}

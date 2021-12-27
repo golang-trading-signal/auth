@@ -37,7 +37,7 @@ func (a AuthMiddleware) authorizationHandler() func(http.Handler) http.Handler {
 					user_email := (*claims)["email"].(string)
 					user, err := a.userRepo.GetUserByUserEmail(user_email)
 					if err != nil {
-						utils.WriteResponse(w, err.Code, err.AsMessage())
+						utils.WriteResponse(w, 0, nil, err)
 						return
 					}
 					ctx = context.WithValue(r.Context(), "user", user)
@@ -50,7 +50,7 @@ func (a AuthMiddleware) authorizationHandler() func(http.Handler) http.Handler {
 
 			} else {
 				appError := errs.NewForbiddenError("Unauthorized")
-				utils.WriteResponse(w, appError.Code, appError.AsMessage())
+				utils.WriteResponse(w, 0, nil, appError)
 			}
 		})
 	}

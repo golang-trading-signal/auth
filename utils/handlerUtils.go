@@ -3,12 +3,21 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+
+	"gitlab.com/bshadmehr76/vgang-auth/errs"
 )
 
-func WriteResponse(w http.ResponseWriter, code int, data interface{}) {
+func WriteResponse(w http.ResponseWriter, code int, data interface{}, err *errs.AppError) {
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(code)
-	if err := json.NewEncoder(w).Encode(data); err != nil {
-		panic(err)
+	if err != nil {
+		w.WriteHeader(err.Code)
+		if err := json.NewEncoder(w).Encode(err.AsMessage()); err != nil {
+			panic(err)
+		}
+	} else {
+		w.WriteHeader(code)
+		if err := json.NewEncoder(w).Encode(data); err != nil {
+			panic(err)
+		}
 	}
 }
