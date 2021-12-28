@@ -16,9 +16,12 @@ import (
 )
 
 func setupMode() {
+	fmt.Println("\n\n\n\n")
+	os.Getenv("DEBUG_MODE")
+	fmt.Println("\n\n\n\n")
 	if os.Getenv("DEBUG_MODE") == "" ||
 		os.Getenv("DEBUG_MODE") == "true" {
-		os.Setenv("SERVER_ADDRESS", "localhost")
+		os.Setenv("SERVER_ADDRESS", "0.0.0.0")
 		os.Setenv("SERVER_PORT", "8000")
 		os.Setenv("MYSQL_USERNAME", "root")
 		os.Setenv("MYSQL_PASSWORD", "secret")
@@ -26,6 +29,9 @@ func setupMode() {
 		os.Setenv("MYSQL_PORT", "3306")
 		os.Setenv("MYSQL_DATABASE", "auth")
 		os.Setenv("HMAC_SECRET", "aefqaw5e8g74qaw6e8g47a56egv4")
+		os.Setenv("REDIS_URI", "localhost")
+		os.Setenv("REDIS_PORT", "6379")
+		os.Setenv("REDIS_PASSWORD", "")
 	}
 }
 
@@ -37,7 +43,9 @@ func sanityCheck() {
 		os.Getenv("MYSQL_URL") == "" ||
 		os.Getenv("MYSQL_PORT") == "" ||
 		os.Getenv("MYSQL_DATABASE") == "" ||
-		os.Getenv("HMAC_SECRET") == "" {
+		os.Getenv("HMAC_SECRET") == "" ||
+		os.Getenv("REDIS_URI") == "" ||
+		os.Getenv("REDIS_PORT") == "" {
 		log.Fatal("Environment variables are no setted correctly...")
 	}
 }
@@ -61,9 +69,9 @@ func getMySQLClient() *sqlx.DB {
 
 func getRedisclient() *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     os.Getenv("REDIS_URI") + ":" + os.Getenv("REDIS_PORT"),
+		Password: os.Getenv("REDIS_PASSWORD"), // no password set
+		DB:       0,                           // use default DB
 	})
 	return rdb
 }

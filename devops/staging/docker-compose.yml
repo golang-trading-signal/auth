@@ -1,0 +1,49 @@
+version: '3.3'
+services:
+  redis:
+    image: redis:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
+
+  mysql:
+    image: mysql:5.6.27
+    ports:
+      - "0.0.0.0:3306:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/db.sql
+    container_name: vgang-auth-db
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+  app:
+    command: ./main
+    build:
+      context: ../../
+      dockerfile: ./devops/staging/Dockerfile
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - redis
+
+  nginx:
+    build:
+      context: ./nginx/
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - app
+
+volumes:
+  mysqldata:
+
+networks:
+  default:
+    name: dev_network
+    driver: bridge
