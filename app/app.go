@@ -16,9 +16,6 @@ import (
 )
 
 func setupMode() {
-	fmt.Println("\n\n\n\n")
-	os.Getenv("DEBUG_MODE")
-	fmt.Println("\n\n\n\n")
 	if os.Getenv("DEBUG_MODE") == "" ||
 		os.Getenv("DEBUG_MODE") == "true" {
 		os.Setenv("SERVER_ADDRESS", "0.0.0.0")
