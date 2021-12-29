@@ -80,5 +80,12 @@ func (ah AuthHandler) logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ah AuthHandler) verify(w http.ResponseWriter, r *http.Request) {
+	var verifyRequest dto.VerifyTokenRequest
+	if err := json.NewDecoder(r.Body).Decode(&verifyRequest); err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, err.Error(), nil)
+	} else {
+		response, err := ah.service.Verify(verifyRequest)
+		utils.WriteResponse(w, http.StatusOK, response, err)
+	}
 
 }

@@ -176,8 +176,15 @@ func (s DefaultAuthService) Logout(token domain.AccessToken) (*dto.LogoutRespons
 	return &response, nil
 }
 
-func (os DefaultAuthService) Verify(verifyTokenRequest dto.VerifyTokenRequest) (*dto.VerifyTokenResponse, *errs.AppError) {
-	return nil, nil
+func (s DefaultAuthService) Verify(verifyTokenRequest dto.VerifyTokenRequest) (*dto.VerifyTokenResponse, *errs.AppError) {
+	token := domain.AccessToken{
+		AccessToken: verifyTokenRequest.AccessToken,
+	}
+	isAuthorized, _ := s.accessTokenRepo.IsAuthorized(token, verifyTokenRequest.Route, nil)
+	response := dto.VerifyTokenResponse{
+		Success: isAuthorized,
+	}
+	return &response, nil
 }
 
 func NewDefaultAuthService(userRrepo domain.UserRepository, tokenRrepo domain.AccessTokenRepository) DefaultAuthService {

@@ -26,7 +26,7 @@ func (r AccessTokenRepositoryDefault) IsAuthorized(token AccessToken, route stri
 
 	val, err := r.redis.Get(ctx, token.AccessToken).Result()
 	if err != nil {
-		// logger.Error(err.Error())
+		logger.Error(err.Error())
 	}
 	if val != "" {
 		return false, nil
