@@ -1,10 +1,10 @@
 package dto
 
 type VerifyTokenRequest struct {
-	AccessToken string `json:"otp"`
+	AccessToken string `json:"token"`
 	Route       string `json:"route"`
 }
 
 type VerifyTokenResponse struct {
-	Success bool `json:"success"`
+	IsVerified bool `json:"is_verified"`
 }

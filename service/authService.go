@@ -182,7 +182,7 @@ func (s DefaultAuthService) Verify(verifyTokenRequest dto.VerifyTokenRequest) (*
 	}
 	isAuthorized, _ := s.accessTokenRepo.IsAuthorized(token, verifyTokenRequest.Route, nil)
 	response := dto.VerifyTokenResponse{
-		Success: isAuthorized,
+		IsVerified: isAuthorized,
 	}
 	return &response, nil
 }
