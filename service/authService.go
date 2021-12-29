@@ -45,6 +45,9 @@ func (s DefaultAuthService) Login(loginRequest dto.LoginRequest) (*dto.LoginResp
 }
 
 func (s DefaultAuthService) Signup(signupRequest dto.SignupRequest) (*dto.SignupResponse, *errs.AppError) {
+	if err := signupRequest.Validate(); err != nil {
+		return nil, err
+	}
 	u, _ := s.userRrepo.GetUserByUserEmail(signupRequest.Email)
 	if u != nil {
 		err := errs.NewBadRequestError("Email address is taken")
@@ -93,6 +96,9 @@ func (s DefaultAuthService) GetOtp(getOtpRequest dto.GetOtpRequest) (*dto.GetOtp
 }
 
 func (s DefaultAuthService) ForgetPass(forgetPassRequest dto.ForgetPassRequest) (*dto.ForgetPassResponse, *errs.AppError) {
+	if err := forgetPassRequest.Validate(); err != nil {
+		return nil, err
+	}
 	u, err := s.userRrepo.GetUserByUserEmail(forgetPassRequest.Email)
 	if err != nil {
 		return nil, err
@@ -127,6 +133,9 @@ func (s DefaultAuthService) ForgetPass(forgetPassRequest dto.ForgetPassRequest) 
 }
 
 func (s DefaultAuthService) ChangePassword(changePassRequest dto.ChangePassRequest, user *domain.User) (*dto.ChangePassResponse, *errs.AppError) {
+	if err := changePassRequest.Validate(); err != nil {
+		return nil, err
+	}
 	if user.ValidateUserPassword(changePassRequest.OldPass) {
 		response := dto.ChangePassResponse{}
 		claims := user.GetJwtClaims()

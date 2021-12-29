@@ -1,6 +1,10 @@
 package dto
 
-import "gitlab.com/bshadmehr76/vgang-auth/domain"
+import (
+	"gitlab.com/bshadmehr76/vgang-auth/domain"
+	"gitlab.com/bshadmehr76/vgang-auth/errs"
+	"gitlab.com/bshadmehr76/vgang-auth/utils"
+)
 
 type SignupRequest struct {
 	Email    string `json:"email"`
@@ -20,6 +24,18 @@ func (r SignupRequest) ToDao() domain.User {
 		Password: r.Password,
 		Name:     r.Name,
 	}
+}
+
+func (r SignupRequest) Validate() *errs.AppError {
+	if err := utils.ValidateEmail(r.Email); err != nil {
+		return err
+	}
+
+	if err := utils.ValidatePassword(r.Password); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func UserToSignupResponse(user domain.User) *SignupResponse {

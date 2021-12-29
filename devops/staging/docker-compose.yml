@@ -18,27 +18,27 @@ services:
     container_name: vgang-auth-db
     environment:
       MYSQL_ROOT_PASSWORD: secret
-  app:
-    command: ./main
-    build:
-      context: ../../
-      dockerfile: ./devops/staging/Dockerfile
-    env_file:
-      - ./.env
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mysql
-      - redis
+  # app:
+  #   command: ./main
+  #   build:
+  #     context: ../../
+  #     dockerfile: ./devops/staging/Dockerfile
+  #   env_file:
+  #     - ./.env
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - mysql
+  #     - redis
 
-  nginx:
-    build:
-      context: ./nginx/
-      dockerfile: Dockerfile
-    ports:
-      - 80:80
-    depends_on:
-      - app
+  # nginx:
+  #   build:
+  #     context: ./nginx/
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 80:80
+  #   depends_on:
+  #     - app
 
 volumes:
   mysqldata:
