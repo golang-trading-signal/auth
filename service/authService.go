@@ -7,6 +7,7 @@ import (
 	"gitlab.com/bshadmehr76/vgang-auth/utils"
 )
 
+//go:generate mockgen -destination=../mocks/service/mockAuthService.go -package=service gitlab.com/bshadmehr76/vgang-auth/service AuthService
 type AuthService interface {
 	Login(dto.LoginRequest) (*dto.LoginResponse, *errs.AppError)
 	Signup(dto.SignupRequest) (*dto.SignupResponse, *errs.AppError)

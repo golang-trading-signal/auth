@@ -86,13 +86,13 @@ func Start() {
 	lmt := tollbooth.NewLimiter(1, nil)
 	lmt.SetIPLookups([]string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"})
 
-	mux.Handle("/login", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), handlers.login)).Methods(http.MethodPost).Name("auth-login")
-	mux.Handle("/signup", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), handlers.signup)).Methods(http.MethodPost).Name("auth-signup")
+	mux.Handle("/login", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), handlers.Login)).Methods(http.MethodPost).Name("auth-login")
+	mux.Handle("/signup", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), handlers.Signup)).Methods(http.MethodPost).Name("auth-signup")
 	mux.HandleFunc("/get_otp", handlers.GetOtp).Methods(http.MethodPost).Name("auth-get_otp")
-	mux.HandleFunc("/forget_pass", handlers.forgetPassword).Methods(http.MethodPost).Name("auth-forget_pass")
-	mux.HandleFunc("/change_password", handlers.changePassword).Methods(http.MethodPost).Name("auth-change_pass")
-	mux.HandleFunc("/logout", handlers.logout).Methods(http.MethodPost).Name("auth-logout")
-	mux.HandleFunc("/verify", handlers.verify).Methods(http.MethodPost).Name("auth-verify")
+	mux.HandleFunc("/forget_pass", handlers.ForgetPassword).Methods(http.MethodPost).Name("auth-forget_pass")
+	mux.HandleFunc("/change_password", handlers.ChangePassword).Methods(http.MethodPost).Name("auth-change_pass")
+	mux.HandleFunc("/logout", handlers.Logout).Methods(http.MethodPost).Name("auth-logout")
+	mux.HandleFunc("/verify", handlers.Verify).Methods(http.MethodPost).Name("auth-verify")
 
 	authMiddleware := AuthMiddleware{domain.NewAccessTokenRepositoryDefault(redis), domain.NewUserRepositoryDB(db)}
 	mux.Use(authMiddleware.authorizationHandler())
