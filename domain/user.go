@@ -21,6 +21,7 @@ type User struct {
 	SecretKey string `db:"secret_key"`
 }
 
+//go:generate mockgen -destination=../mocks/domain/mockUserRepository.go -package=domain gitlab.com/bshadmehr76/vgang-auth/domain UserRepository
 type UserRepository interface {
 	GetUserByUserEmail(string) (*User, *errs.AppError)
 	CreateUser(string, string, string, string) (int64, *errs.AppError)

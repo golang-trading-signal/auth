@@ -12,6 +12,9 @@ const (
 )
 
 func GenerateNewOtp(secret string) (string, *errs.AppError) {
+	if secret == "" {
+		return "", errs.NewUnexpectedError("User secret key is invalid")
+	}
 	key, err := totp.GenerateCode(secret, time.Now())
 	if err != nil {
 		return "", errs.NewUnexpectedError("An error eccured while trying to create a secret key")

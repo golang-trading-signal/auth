@@ -16,6 +16,7 @@ type AccessToken struct {
 	ExpiresAt    int64
 }
 
+//go:generate mockgen -destination=../mocks/domain/mockAccessTokenRepository.go -package=domain gitlab.com/bshadmehr76/vgang-auth/domain AccessTokenRepository
 type AccessTokenRepository interface {
 	IsAuthorized(token AccessToken, route string, vars map[string]string) (bool, *jwt.MapClaims)
 	Logout(token AccessToken) *errs.AppError
