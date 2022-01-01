@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"gitlab.com/bshadmehr76/vgang-auth/errs"
+	"github.com/golang-trading-signal/libs/errs"
 	"gitlab.com/bshadmehr76/vgang-auth/utils"
 )
 

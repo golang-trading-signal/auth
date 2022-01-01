@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"gitlab.com/bshadmehr76/vgang-auth/errs"
+	"github.com/golang-trading-signal/libs/errs"
 	"golang.org/x/crypto/bcrypt"
 )
 

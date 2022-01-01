@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"gitlab.com/bshadmehr76/vgang-auth/errs"
-	"gitlab.com/bshadmehr76/vgang-auth/logger"
+	"github.com/golang-trading-signal/libs/errs"
+	"github.com/golang-trading-signal/libs/logger"
 )
 
 type AccessToken struct {

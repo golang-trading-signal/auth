@@ -3,8 +3,8 @@ package domain
 import (
 	"database/sql"
 
-	"gitlab.com/bshadmehr76/vgang-auth/errs"
-	"gitlab.com/bshadmehr76/vgang-auth/logger"
+	"github.com/golang-trading-signal/libs/errs"
+	"github.com/golang-trading-signal/libs/logger"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"

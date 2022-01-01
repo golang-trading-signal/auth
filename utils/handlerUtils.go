@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gitlab.com/bshadmehr76/vgang-auth/errs"
+	"github.com/golang-trading-signal/libs/errs"
 )
 
 func WriteResponse(w http.ResponseWriter, code int, data interface{}, err *errs.AppError) {

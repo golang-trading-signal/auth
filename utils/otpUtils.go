@@ -3,8 +3,8 @@ package utils
 import (
 	"time"
 
+	"github.com/golang-trading-signal/libs/errs"
 	"github.com/pquerna/otp/totp"
-	"gitlab.com/bshadmehr76/vgang-auth/errs"
 )
 
 const (

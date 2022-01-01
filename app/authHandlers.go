@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/golang-trading-signal/libs/errs"
 	"gitlab.com/bshadmehr76/vgang-auth/domain"
 	"gitlab.com/bshadmehr76/vgang-auth/dto"
-	"gitlab.com/bshadmehr76/vgang-auth/errs"
 	"gitlab.com/bshadmehr76/vgang-auth/service"
 	"gitlab.com/bshadmehr76/vgang-auth/utils"
 )

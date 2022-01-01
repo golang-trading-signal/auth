@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/golang-trading-signal/libs/errs"
 	"github.com/gorilla/mux"
 	"gitlab.com/bshadmehr76/vgang-auth/domain"
-	"gitlab.com/bshadmehr76/vgang-auth/errs"
 	"gitlab.com/bshadmehr76/vgang-auth/utils"
 )
 

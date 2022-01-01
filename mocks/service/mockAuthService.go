@@ -10,7 +10,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	domain "gitlab.com/bshadmehr76/vgang-auth/domain"
 	dto "gitlab.com/bshadmehr76/vgang-auth/dto"
-	errs "gitlab.com/bshadmehr76/vgang-auth/errs"
+	errs "github.com/golang-trading-signal/libs/errs"
 )
 
 // MockAuthService is a mock of AuthService interface.
