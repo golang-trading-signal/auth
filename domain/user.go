@@ -27,6 +27,7 @@ type UserRepository interface {
 	GetUserByUserEmail(string) (*User, *errs.AppError)
 	CreateUser(string, string, string, string) (int64, *errs.AppError)
 	UpdateUserPassword(string, string) *errs.AppError
+	SendOtpEmail(string, string) *errs.AppError
 }
 
 func (u User) ValidateUserPassword(password string) bool {

@@ -65,6 +65,20 @@ func (mr *MockUserRepositoryMockRecorder) GetUserByUserEmail(arg0 interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUserEmail", reflect.TypeOf((*MockUserRepository)(nil).GetUserByUserEmail), arg0)
 }
 
+// SendOtpEmail mocks base method.
+func (m *MockUserRepository) SendOtpEmail(arg0, arg1 string) *errs.AppError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendOtpEmail", arg0, arg1)
+	ret0, _ := ret[0].(*errs.AppError)
+	return ret0
+}
+
+// SendOtpEmail indicates an expected call of SendOtpEmail.
+func (mr *MockUserRepositoryMockRecorder) SendOtpEmail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendOtpEmail", reflect.TypeOf((*MockUserRepository)(nil).SendOtpEmail), arg0, arg1)
+}
+
 // UpdateUserPassword mocks base method.
 func (m *MockUserRepository) UpdateUserPassword(arg0, arg1 string) *errs.AppError {
 	m.ctrl.T.Helper()

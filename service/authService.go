@@ -95,7 +95,7 @@ func (s DefaultAuthService) GetOtp(getOtpRequest dto.GetOtpRequest) (*dto.GetOtp
 	if err != nil {
 		return nil, err
 	}
-	u.SendUserOtp(otp)
+	s.userRrepo.SendOtpEmail(u.Email, otp)
 	response := dto.GetOtpResponse{
 		Success: true,
 	}

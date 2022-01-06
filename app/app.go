@@ -10,6 +10,7 @@ import (
 	"github.com/didip/tollbooth"
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
+	"github.com/hibiken/asynq"
 	"github.com/jmoiron/sqlx"
 	"gitlab.com/bshadmehr76/vgang-auth/domain"
 	"gitlab.com/bshadmehr76/vgang-auth/service"
@@ -80,8 +81,9 @@ func Start() {
 	mux := mux.NewRouter()
 
 	db := getMySQLClient()
+	asynq := asynq.NewClient(asynq.RedisClientOpt{Addr: os.Getenv("REDIS_URI") + ":" + os.Getenv("REDIS_PORT")})
 	redis := getRedisclient()
-	handlers := AuthHandler{service.NewDefaultAuthService(domain.NewUserRepositoryDB(db), domain.NewAccessTokenRepositoryDefault(redis))}
+	handlers := AuthHandler{service.NewDefaultAuthService(domain.NewUserRepositoryDefault(db, asynq), domain.NewAccessTokenRepositoryDefault(redis))}
 
 	lmt := tollbooth.NewLimiter(1, nil)
 	lmt.SetIPLookups([]string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"})
@@ -95,7 +97,7 @@ func Start() {
 	mux.HandleFunc("/verify", handlers.Verify).Methods(http.MethodPost).Name("auth-verify")
 	mux.HandleFunc("/refresh", handlers.Refresh).Methods(http.MethodPost).Name("auth-refresh")
 
-	authMiddleware := AuthMiddleware{domain.NewAccessTokenRepositoryDefault(redis), domain.NewUserRepositoryDB(db)}
+	authMiddleware := AuthMiddleware{domain.NewAccessTokenRepositoryDefault(redis), domain.NewUserRepositoryDefault(db, asynq)}
 	mux.Use(authMiddleware.authorizationHandler())
 
 	// Starting server

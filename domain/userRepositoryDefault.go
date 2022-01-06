@@ -2,19 +2,23 @@ package domain
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/golang-trading-signal/libs/errs"
 	"github.com/golang-trading-signal/libs/logger"
+	"github.com/hibiken/asynq"
+	"gitlab.com/bshadmehr76/vgang-auth/tasks"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
-type UserRepositoryDB struct {
+type UserRepositoryDefault struct {
 	client *sqlx.DB
+	asynq  *asynq.Client
 }
 
-func (d UserRepositoryDB) GetUserByUserEmail(email string) (*User, *errs.AppError) {
+func (d UserRepositoryDefault) GetUserByUserEmail(email string) (*User, *errs.AppError) {
 	getByIDSQL := "select id, email, name, password, secret_key from users where email = ?"
 
 	var u User
@@ -31,7 +35,7 @@ func (d UserRepositoryDB) GetUserByUserEmail(email string) (*User, *errs.AppErro
 	return &u, nil
 }
 
-func (d UserRepositoryDB) CreateUser(email string, name string, password string, secret_key string) (int64, *errs.AppError) {
+func (d UserRepositoryDefault) CreateUser(email string, name string, password string, secret_key string) (int64, *errs.AppError) {
 	insertUserQuery := "INSERT INTO users (email, name, password, secret_key) VALUES (?, ?, ?, ?)"
 
 	result := d.client.MustExec(insertUserQuery, email, name, password, secret_key)
@@ -44,7 +48,7 @@ func (d UserRepositoryDB) CreateUser(email string, name string, password string,
 	return id, nil
 }
 
-func (d UserRepositoryDB) UpdateUserPassword(email string, password string) *errs.AppError {
+func (d UserRepositoryDefault) UpdateUserPassword(email string, password string) *errs.AppError {
 
 	updatePAsswordQuery := "UPDATE users SET password = ? WHERE email = ?"
 
@@ -58,6 +62,20 @@ func (d UserRepositoryDB) UpdateUserPassword(email string, password string) *err
 	return nil
 }
 
-func NewUserRepositoryDB(client *sqlx.DB) UserRepositoryDB {
-	return UserRepositoryDB{client}
+func (d UserRepositoryDefault) SendOtpEmail(email string, otp string) *errs.AppError {
+	task, err := tasks.NewEmailDeliveryTask(42, "some:template:id")
+	if err != nil {
+		fmt.Println("could not create task:", err)
+	}
+	info, err := d.asynq.Enqueue(task)
+	if err != nil {
+		fmt.Println("could not enqueue task:", err)
+	}
+	fmt.Println("enqueued task:", info.ID, info.Queue)
+
+	return nil
+}
+
+func NewUserRepositoryDefault(client *sqlx.DB, asynq *asynq.Client) UserRepositoryDefault {
+	return UserRepositoryDefault{client, asynq}
 }
