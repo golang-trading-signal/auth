@@ -7,9 +7,9 @@ package domain
 import (
 	reflect "reflect"
 
+	errs "github.com/golang-trading-signal/libs/errs"
 	gomock "github.com/golang/mock/gomock"
 	domain "gitlab.com/bshadmehr76/vgang-auth/domain"
-	errs "github.com/golang-trading-signal/libs/errs"
 )
 
 // MockUserRepository is a mock of UserRepository interface.

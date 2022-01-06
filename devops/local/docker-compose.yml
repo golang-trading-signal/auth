@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.4'
 services:
   redis:
     image: redis:latest
@@ -35,8 +35,3 @@ services:
 
 volumes:
   mysqldata:
-
-networks:
-  default:
-    name: local_network
-    driver: bridge

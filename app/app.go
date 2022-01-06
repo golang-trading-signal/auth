@@ -93,6 +93,7 @@ func Start() {
 	mux.HandleFunc("/change_password", handlers.ChangePassword).Methods(http.MethodPost).Name("auth-change_pass")
 	mux.HandleFunc("/logout", handlers.Logout).Methods(http.MethodPost).Name("auth-logout")
 	mux.HandleFunc("/verify", handlers.Verify).Methods(http.MethodPost).Name("auth-verify")
+	mux.HandleFunc("/refresh", handlers.Refresh).Methods(http.MethodPost).Name("auth-refresh")
 
 	authMiddleware := AuthMiddleware{domain.NewAccessTokenRepositoryDefault(redis), domain.NewUserRepositoryDB(db)}
 	mux.Use(authMiddleware.authorizationHandler())

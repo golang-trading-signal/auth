@@ -17,7 +17,7 @@ type AccessTokenRepositoryDefault struct {
 }
 
 func (r AccessTokenRepositoryDefault) IsAuthorized(token AccessToken, route string, vars map[string]string) (bool, *jwt.MapClaims) {
-	publicApis := []string{"auth-login", "auth-signup", "auth-get_otp", "auth-forget_pass", "auth-verify"}
+	publicApis := []string{"auth-login", "auth-signup", "auth-get_otp", "auth-forget_pass", "auth-verify", "auth-refresh"}
 	for _, r := range publicApis {
 		if r == route {
 			return true, nil

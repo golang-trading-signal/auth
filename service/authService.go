@@ -16,6 +16,7 @@ type AuthService interface {
 	ChangePassword(dto.ChangePassRequest, *domain.User) (*dto.ChangePassResponse, *errs.AppError)
 	Logout(token domain.AccessToken) (*dto.LogoutResponse, *errs.AppError)
 	Verify(dto.VerifyTokenRequest) (*dto.VerifyTokenResponse, *errs.AppError)
+	Refresh(dto.RefreshTokenRequest) (*dto.RefreshTokenResponse, *errs.AppError)
 }
 
 type DefaultAuthService struct {
@@ -30,13 +31,18 @@ func (s DefaultAuthService) Login(loginRequest dto.LoginRequest) (*dto.LoginResp
 	}
 	if u.ValidateUserPassword(loginRequest.Password) {
 		response := dto.LoginResponse{}
-		claims := u.GetJwtClaims()
-		token, err := domain.GetNewAccessToken(claims)
+		token, err := domain.GetNewAccessToken(u.GetJwtClaims())
 		if err != nil {
 			return nil, err
 		}
+
+		refresh, err := domain.GetNewRefreshToken(u.GetRefreshJwtClaims())
+		if err != nil {
+			return nil, err
+		}
+
 		response.AccessToken = token.AccessToken
-		response.RefreshToken = token.RefreshToken
+		response.RefreshToken = refresh.RefreshToken
 		return &response, nil
 	} else {
 		// Don't change this
@@ -184,6 +190,22 @@ func (s DefaultAuthService) Verify(verifyTokenRequest dto.VerifyTokenRequest) (*
 	isAuthorized, _ := s.accessTokenRepo.IsAuthorized(token, verifyTokenRequest.Route, nil)
 	response := dto.VerifyTokenResponse{
 		IsVerified: isAuthorized,
+	}
+	return &response, nil
+}
+
+func (s DefaultAuthService) Refresh(refreshTokenRequest dto.RefreshTokenRequest) (*dto.RefreshTokenResponse, *errs.AppError) {
+	token := domain.AccessToken{
+		AccessToken: refreshTokenRequest.RefreshToken,
+	}
+	_, claims := s.accessTokenRepo.IsAuthorized(token, "", nil)
+
+	t, err := domain.GetNewAccessTokenFromRefreshClaims(*claims)
+	if err != nil {
+		return nil, err
+	}
+	response := dto.RefreshTokenResponse{
+		Token: t.AccessToken,
 	}
 	return &response, nil
 }

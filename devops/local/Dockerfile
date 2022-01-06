@@ -3,7 +3,7 @@ FROM golang:1.17
 WORKDIR /app
 # Cache and install dependencies
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod download -x
 # Copy app files
 COPY . .
 

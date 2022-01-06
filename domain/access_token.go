@@ -43,6 +43,26 @@ func GetNewAccessToken(claims jwt.MapClaims) (*AccessToken, *errs.AppError) {
 	}, nil
 }
 
+func GetNewAccessTokenFromRefreshClaims(claims jwt.MapClaims) (*AccessToken, *errs.AppError) {
+	delete(claims, "type")
+	claims["exp"] = time.Now().Add(TOKEN_DURATION_MINUTES * time.Minute).Unix()
+	return GetNewAccessToken(claims)
+}
+
+func GetNewRefreshToken(claims jwt.MapClaims) (*AccessToken, *errs.AppError) {
+	claims["type"] = "refresh"
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedTokenAsString, err := token.SignedString([]byte(os.Getenv("HMAC_SECRET")))
+	if err != nil {
+		err := errs.NewUnexpectedError("Error while creating access token")
+		return nil, err
+	}
+	return &AccessToken{
+		AccessToken:  "",
+		RefreshToken: signedTokenAsString,
+	}, nil
+}
+
 func JwtTokenFromString(tokenString string) (*jwt.Token, *errs.AppError) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("HMAC_SECRET")), nil

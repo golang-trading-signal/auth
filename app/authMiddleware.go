@@ -34,6 +34,9 @@ func (a AuthMiddleware) authorizationHandler() func(http.Handler) http.Handler {
 			if isAuthorized {
 				var ctx context.Context
 				if claims != nil {
+					if (*claims)["type"] == "refresh" {
+						return
+					}
 					user_email := (*claims)["email"].(string)
 					user, err := a.userRepo.GetUserByUserEmail(user_email)
 					if err != nil {

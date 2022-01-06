@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	TOKEN_DURATION_MINUTES = 10
+	TOKEN_DURATION_MINUTES         = 1
+	REFRESH_TOKEN_DURATION_MINUTES = 60 * 24 * 60
 )
 
 type User struct {
@@ -38,6 +39,14 @@ func (u User) GetJwtClaims() jwt.MapClaims {
 		"user_id": u.Id,
 		"email":   u.Email,
 		"exp":     time.Now().Add(TOKEN_DURATION_MINUTES * time.Minute).Unix(),
+	}
+}
+
+func (u User) GetRefreshJwtClaims() jwt.MapClaims {
+	return jwt.MapClaims{
+		"user_id": u.Id,
+		"email":   u.Email,
+		"exp":     time.Now().Add(REFRESH_TOKEN_DURATION_MINUTES * time.Minute).Unix(),
 	}
 }
 

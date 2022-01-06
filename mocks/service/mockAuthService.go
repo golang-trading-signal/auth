@@ -7,10 +7,10 @@ package service
 import (
 	reflect "reflect"
 
+	errs "github.com/golang-trading-signal/libs/errs"
 	gomock "github.com/golang/mock/gomock"
 	domain "gitlab.com/bshadmehr76/vgang-auth/domain"
 	dto "gitlab.com/bshadmehr76/vgang-auth/dto"
-	errs "github.com/golang-trading-signal/libs/errs"
 )
 
 // MockAuthService is a mock of AuthService interface.
@@ -109,6 +109,21 @@ func (m *MockAuthService) Logout(arg0 domain.AccessToken) (*dto.LogoutResponse, 
 func (mr *MockAuthServiceMockRecorder) Logout(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logout", reflect.TypeOf((*MockAuthService)(nil).Logout), arg0)
+}
+
+// Refresh mocks base method.
+func (m *MockAuthService) Refresh(arg0 dto.RefreshTokenRequest) (*dto.RefreshTokenResponse, *errs.AppError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Refresh", arg0)
+	ret0, _ := ret[0].(*dto.RefreshTokenResponse)
+	ret1, _ := ret[1].(*errs.AppError)
+	return ret0, ret1
+}
+
+// Refresh indicates an expected call of Refresh.
+func (mr *MockAuthServiceMockRecorder) Refresh(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Refresh", reflect.TypeOf((*MockAuthService)(nil).Refresh), arg0)
 }
 
 // Signup mocks base method.

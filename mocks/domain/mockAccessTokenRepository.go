@@ -8,9 +8,9 @@ import (
 	reflect "reflect"
 
 	jwt "github.com/golang-jwt/jwt"
+	errs "github.com/golang-trading-signal/libs/errs"
 	gomock "github.com/golang/mock/gomock"
 	domain "gitlab.com/bshadmehr76/vgang-auth/domain"
-	errs "github.com/golang-trading-signal/libs/errs"
 )
 
 // MockAccessTokenRepository is a mock of AccessTokenRepository interface.

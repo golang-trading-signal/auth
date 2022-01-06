@@ -89,3 +89,14 @@ func (ah AuthHandler) Verify(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func (ah AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
+	var refreshRequest dto.RefreshTokenRequest
+	if err := json.NewDecoder(r.Body).Decode(&refreshRequest); err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, err.Error(), nil)
+	} else {
+		response, err := ah.Service.Refresh(refreshRequest)
+		utils.WriteResponse(w, http.StatusOK, response, err)
+	}
+
+}
